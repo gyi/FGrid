@@ -1,0 +1,91 @@
+package module.${package}.bo;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import sunray.base.ServiceSupport;
+import sunray.util.DateUtil;
+import sunray.util.JSONResult;
+import sunray.util.Util;
+
+import module.pojo.${pojoClassName};
+
+/**
+ * ${objectComment} 
+ *
+ * @author ${author}
+ * @version ${version}
+ * 
+ * 
+ * history:
+ * 
+ */
+@SuppressWarnings("unchecked")@Service("${objectName}Bo")
+public interface I${className}Bo{
+	/**
+	 * select ${objectComment} page list
+	 * 
+	 * @param map
+	 * @return 
+	 * 
+	 * history:
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public Map getPageList(Map map) ;
+	
+	<#if onAddClickExist == "true">
+	
+	/**
+	 * 娣诲姞${objectComment}
+	 * 
+	 * @param map
+	 * @return
+	 * @throws BadPaddingException 
+	 * @throws IllegalBlockSizeException 
+	 * @throws NoSuchPaddingException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws UnsupportedEncodingException 
+	 * @throws InvalidKeyException 
+	 * 
+	 */
+	public void doAdd(${pojoClassName} ${pojoObjectName}) throws Exception ;
+	</#if>
+	
+	<#if onModifyClickExist == "true">
+
+	/**
+	 * 鏌ヨ涓�潯${objectComment}淇℃伅
+	 */
+	public Map getById(String id);
+	
+	/**
+	 * ${objectComment}淇℃伅妫�煡
+	 * 
+	 * @param id  浠ｇ悊涓婚敭
+	 * 
+	 * @return JSONResult
+	 */
+	public void isExist(JSONResult json,String id) ;
+
+	/**
+	 * 淇敼${objectComment}
+	 * 
+	 * @param statement
+	 */
+	public void doModify(${pojoClassName} ${pojoObjectName});
+	</#if>
+
+	<#if onDelectClickExist == "true">
+	/**
+	 * 鍒犻櫎${objectComment}
+	 * 
+	 * @param map
+	 */
+	public void doDel(Map map);
+	</#if>
+}

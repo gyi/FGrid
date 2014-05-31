@@ -1,0 +1,24 @@
+package module.pojo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.collections.FactoryUtils;
+import org.apache.commons.collections.ListUtils;
+
+public class ${pojoClassName} {
+	
+	<#list pojoColumn as pojoColumn>
+	private String ${pojoColumn.objectColumn};
+	</#list>
+	
+	<#list pojoColumn as pojoColumn>
+	public String get${pojoColumn.modelColumn}() {
+		return ${pojoColumn.objectColumn};
+	}
+	public void set${pojoColumn.modelColumn}(String ${pojoColumn.objectColumn}) {
+		this.${pojoColumn.objectColumn} = ${pojoColumn.objectColumn};
+	}
+	</#list>
+	
+}

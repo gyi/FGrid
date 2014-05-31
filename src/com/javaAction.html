@@ -1,0 +1,191 @@
+package module.${package}.action;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.ServletRequestUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import sunray.base.MultiControllerSupport;
+import sunray.util.Constant;
+import sunray.util.JSONResult;
+import sunray.util.Util;
+
+import module.${package}.bo.I${className}Bo;
+
+import module.pojo.${pojoClassName};
+
+/**
+ * ${objectComment}Action
+ * 
+ * @author ${author}
+ * @version  ${version}
+ * 
+ * 
+ * history:
+ *
+ */
+@Controller
+@RequestMapping(value="/${objectName}.do")
+public class ${className}Action extends MultiControllerSupport{
+	
+	public String getModel() {
+		return "${objectComment}";
+	}
+
+	//注入BO
+	@Resource( name="${objectName}Bo")
+	I${className}Bo ${objectName}Bo=null;
+	
+	/**
+	 * show check ${objectName} page list
+	 * 
+	 * @param request
+	 * @param response void
+	 * 
+	 */
+	@RequestMapping(params="method=getPageList")
+	public void getPageList(HttpServletRequest request, HttpServletResponse response){
+		JSONResult json = new JSONResult();
+		try{
+			Map map = Util.fetchRequestParameters(request);
+			Map dataMap = ${objectName}Bo.getPageList(map);
+			json.setData(dataMap);
+		}catch(Exception e){
+			log.error(e);
+			json.setErrorType("fail");
+		}
+		System.out.print("");
+		json.write(response);
+	}
+
+	<#if onAddClickExist == "true">	
+	/**
+	 * 显示添加页面 增加数据
+	 * 
+	 * @param request HTTP请求对象
+	 * @param response HTTP相应对象
+	 * @return jsp/systemMaintenance/limit/showAddLimit.jsp
+	 */
+	@RequestMapping(params = "method=showAddView")
+	public String showAddView(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	
+		//获得当前站点数据
+		return "${fileName}/showAdd${className}";
+	}
+	
+	/**
+	 * 添加
+	 * 
+	 * @param request HTTP请求对象
+	 * @param response HTTP相应对象
+	 * 
+	 */
+	@RequestMapping(params = "method=doAdd")
+	public void doAdd(HttpServletRequest request,HttpServletResponse response, ${pojoClassName} ${pojoObjectName}){
+		JSONResult json = new JSONResult();
+		
+		//获得添加数据
+		try{
+			if (!Util.strIsEmpty(json.getType())) {
+				json.write(response);
+				return;
+			}
+			//添加
+			${objectName}Bo.doAdd(${pojoObjectName});
+			json.setSuccessType("success");
+		}catch(Exception e){
+			e.printStackTrace();
+			json.setErrorType("fail");
+		}
+		json.write(response);
+	}
+	</#if>
+	
+	<#if onModifyClickExist == "true">
+	/**
+	 * 显示修改页面
+	 * 
+	 * @param request HTTP请求对象
+	 * @param response HTTP相应对象
+	 * @return jsp/systemMaintenance/operator/showModifyOperator.jsp
+	 */
+	@RequestMapping(params = "method=showModifyView")
+	public String showModifyView(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String id  = ServletRequestUtils.getStringParameter(request, "id");
+		Map map = (HashMap)${objectName}Bo.getById(id);
+
+		//获得操作员数据
+		request.setAttribute("${objectName}List", map);
+		
+		return "${fileName}/showModify${className}";
+	}
+	
+	/**
+	 * 修改操作员
+	 * 
+	 * @param request HTTP请求对象
+	 * @param response HTTP相应对象
+	 * 
+	 */
+	@RequestMapping(params = "method=doModify")
+	public void doModify(HttpServletRequest request,HttpServletResponse response, ${pojoClassName} ${pojoObjectName}){
+		JSONResult json = new JSONResult();
+		String id = ${pojoObjectName}.getId();
+		try{
+			//判断操作员是否存在
+			${objectName}Bo.isExist(json,id);
+			if (!Util.strIsEmpty(json.getType())) {
+				json.write(response);
+				return;
+			}
+			
+			//获得操作员数据
+			HashMap operatorMap=(HashMap)${objectName}Bo.getById(id);
+     		
+     		//修改操作员数据
+			${objectName}Bo.doModify(${pojoObjectName});
+     		json.setSuccessType("success");
+		}catch(Exception e){
+			e.printStackTrace();
+			json.setSuccessType("fail");
+		}
+		json.write(response);
+	}
+	</#if>
+	
+	<#if onDelectClickExist == "true">
+	/**
+	 * 删除操作
+	 * 
+	 * @param request
+	 * @param response
+	 */
+	 
+	@RequestMapping(params = "method=doDel")
+	public void doDel(HttpServletRequest request, HttpServletResponse response) {
+		JSONResult json = new JSONResult();
+		String id = ServletRequestUtils.getIntParameter(request, "id", 0);
+		try {
+			
+			//判断操作员是否存在
+			${objectName}Bo.isExist${className}(json,id,false);
+			if (!Util.strIsEmpty(json.getType())) {
+				json.write(response);
+				return;
+			}
+			
+			${objectName}Bo.doDel(id);
+			json.setSuccessType("success");
+		} catch (Exception e) {
+			json.setErrorType("fail");
+		}
+		json.write(response);
+	}
+	</#if>
+}
