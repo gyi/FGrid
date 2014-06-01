@@ -1,0 +1,171 @@
+package module.${package}.bo;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import sunray.base.ServiceSupport;
+import sunray.util.DateUtil;
+import sunray.util.JSONResult;
+import sunray.util.Util;
+
+import module.${package}.bo.I${className}Bo;
+import module.pojo.${pojoClassName};
+
+/**
+ * ${objectComment} 
+ *
+ * @author ${author}
+ * @version ${version}
+ * 
+ * 
+ * history:
+ * 
+ */
+@SuppressWarnings("unchecked")@Service("${objectName}Bo")
+public class ${className}BoImpl extends ServiceSupport implements I${className}Bo {
+	/**
+	 * select ${objectComment} page list
+	 * 
+	 * @param map
+	 * @return 
+	 * 
+	 * history:
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public Map getPageList(Map map) {
+		
+		//get page condition
+		int start = Util.obj2int(map.get("start"));
+		int limit = Util.obj2int(map.get("limit"));
+		List<Object> paramList=new ArrayList<Object>(50);
+		
+		//get select sql
+		String sql=	" select "+
+					<#list column as column>
+					" t.${column.databaseColumn},"+
+					</#list>
+					" t.${columnKey.databaseColumn} "+
+					" from ${tableName} t where 1 = 1 ";
+		
+		//execute
+		sql += " order by t.${columnKey.databaseColumn} desc ";
+		Map returnMap = dbo.getPageMap(start, limit, sql, paramList.toArray());		
+		System.out.print("");
+		return returnMap;
+	}
+	
+	<#if onAddClickExist == "true">
+	
+	/**
+	 * 添加${objectComment}
+	 * 
+	 * @param map
+	 * @return
+	 * @throws BadPaddingException 
+	 * @throws IllegalBlockSizeException 
+	 * @throws NoSuchPaddingException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws UnsupportedEncodingException 
+	 * @throws InvalidKeyException 
+	 * 
+	 */
+	public void doAdd(${pojoClassName} ${pojoObjectName}) throws Exception {
+		
+		String sql= "";
+
+		sql=" insert into ${tableName} t "+
+			" ( "+
+			<#list columnModify as columnModify>
+			" ${columnModify.databaseColumn}, "+
+			</#list>
+			" t.${columnKey.databaseColumn} "+
+			") "+
+			" values( "+
+			<#list columnModify as columnModify>
+			" ?, "+
+			</#list>
+			" ? " +
+			" ) ";
+		
+		List list = new ArrayList();
+		
+		<#list columnModify as columnModify>
+		list.add(${pojoObjectName}.get${columnModify.modelColumn}());
+		</#list>
+		
+		list.add(dbo.getSequenceNextVal("${tableName}","${columnKey.databaseColumn}"));
+		
+		dbo.executeUpdate(sql, list.toArray());
+	}
+	</#if>
+	
+	<#if onModifyClickExist == "true">
+
+	/**
+	 * 查询一条${objectComment}信息
+	 */
+	public Map getById(String id){
+		String sql = " select " +
+				 	"  * " +
+				 	" from ${tableName} t" +
+				 	" where t.${columnKey.databaseColumn} = ? " ;
+		return (HashMap)this.dbo.readFirstRecord(sql, new Object[]{id});
+	}
+	
+	/**
+	 * ${objectComment}信息检查
+	 * 
+	 * @param id  代理主键
+	 * 
+	 * @return JSONResult
+	 */
+	public void isExist(JSONResult json,String id) {
+		String sql = "select * from ${tableName} t where t.${columnKey.databaseColumn}=? ";
+		if (!dbo.isRecordExists(sql, new Object[]{id})) {
+			json.setErrorType(this.messageContext.getMessage("validate-0001", new Object[]{"${objectComment}"}));
+		}
+	}
+
+	/**
+	 * 修改${objectComment}
+	 * 
+	 * @param statement
+	 */
+	public void doModify(${pojoClassName} ${pojoObjectName}){
+		String sql;
+		sql=" update ${tableName} t set"+
+			<#list columnModify as columnModify>
+			" t.${columnModify.databaseColumn}= ?, "+
+			</#list>
+			" t.${columnKey.databaseColumn}= ? "+
+			" where t.${columnKey.databaseColumn} = ?";
+		
+		List list = new ArrayList();
+		
+		<#list columnModify as columnModify>
+		list.add(${pojoObjectName}.get${columnModify.modelColumn}());
+		</#list>
+		list.add(${pojoObjectName}.get${columnKey.modelColumn}());
+		
+		this.dbo.executeUpdate(sql, list.toArray());
+	}
+	</#if>
+
+	<#if onDelectClickExist == "true">
+	/**
+	 * 删除${objectComment}
+	 * 
+	 * @param map
+	 */
+	public void doDel(Map map){
+		String sql = "update ${tableName} t set t.state = -1, t.modify_time = ? where t.${columnKey.databaseColumn} = ?";
+		
+		this.dbo.executeUpdate(sql, new Object[]{DateUtil.getDateTime(),map.get("${columnKey.databaseColumn}")});
+	}
+	</#if>
+}
